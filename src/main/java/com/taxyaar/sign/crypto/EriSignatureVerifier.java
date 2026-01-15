@@ -32,4 +32,26 @@ public class EriSignatureVerifier {
         }
         return false;
     }
+
+    public boolean verifySignedData(
+            String signBase64,
+            String dataBase64,
+            X509Certificate cert) throws Exception {
+
+        byte[] signBytes = java.util.Base64.getDecoder().decode(signBase64);
+        byte[] dataBytes = java.util.Base64.getDecoder().decode(dataBase64);
+
+        CMSSignedData cms = new CMSSignedData(
+                new CMSProcessableByteArray(dataBytes),
+                signBytes);
+
+        for (SignerInformation signer : cms.getSignerInfos().getSigners()) {
+            return signer.verify(
+                    new JcaSimpleSignerInfoVerifierBuilder()
+                            .setProvider("BC")
+                            .build(cert));
+        }
+        return false;
+    }
+
 }

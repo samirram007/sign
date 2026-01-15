@@ -31,4 +31,10 @@ public class SignController {
             throws Exception {
         return service.verify(req);
     }
+
+    @PostMapping("/verify_cert")
+    public boolean verifyCert(@RequestBody VerifySignRequestDto req)
+            throws Exception {
+        return service.verifyCert(req);
+    }
 }
