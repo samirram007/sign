@@ -2,11 +2,14 @@ package com.taxyaar.sign.service;
 
 import java.security.cert.X509Certificate;
 
+import javax.crypto.SecretKey;
+
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.taxyaar.sign.crypto.CerCertificateLoader;
+import com.taxyaar.sign.crypto.CryptoUtil;
 import com.taxyaar.sign.crypto.EriSignatureVerifier;
 import com.taxyaar.sign.crypto.EriSigner;
 import com.taxyaar.sign.crypto.PfxKeyLoader;
@@ -21,16 +24,18 @@ public class SignService {
     private final PfxKeyLoader loader;
     private final EriSignatureVerifier verifier;
     private final CerCertificateLoader certLoader;
+    private final CryptoUtil cryptoUtil;
 
     @Value("${eri.cer.path}")
     private String cerPath;
 
     public SignService(EriSigner signer, PfxKeyLoader loader, CerCertificateLoader certLoader,
-            EriSignatureVerifier verifier) {
+            EriSignatureVerifier verifier, CryptoUtil cryptoUtil) {
         this.signer = signer;
         this.loader = loader;
         this.certLoader = certLoader;
         this.verifier = verifier;
+        this.cryptoUtil = cryptoUtil;
     }
 
     public SignedDataResponseDto generate(SignedDataRequestDto req) throws Exception {
@@ -60,5 +65,15 @@ public class SignService {
                 request.getSign(),
                 request.getData(),
                 cert);
+    }
+
+    public String getEncryptedPlainText(String plainText, String key) throws Exception {
+
+        return cryptoUtil.encrypt(plainText, key);
+        // try {
+        // return cryptoUtil.encrypt(plainText, key);
+        // } catch (Exception e) {
+        // throw new Exception("Error encrypting plain text: " + e.getMessage(), e);
+        // }
     }
 }

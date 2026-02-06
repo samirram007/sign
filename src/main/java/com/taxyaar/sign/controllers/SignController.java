@@ -1,10 +1,13 @@
 package com.taxyaar.sign.controllers;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.taxyaar.sign.dto.request.EncryptedPlanText;
 import com.taxyaar.sign.dto.request.SignedDataRequestDto;
 import com.taxyaar.sign.dto.request.VerifySignRequestDto;
 import com.taxyaar.sign.dto.response.SignedDataResponseDto;
@@ -37,4 +40,11 @@ public class SignController {
             throws Exception {
         return service.verifyCert(req);
     }
+
+    @PostMapping("/encrypted-plain-text")
+    public String getEncryptedPlainText(@RequestBody EncryptedPlanText request)
+            throws Exception {
+        return service.getEncryptedPlainText(request.getPlainText(), request.getKey());
+    }
+
 }

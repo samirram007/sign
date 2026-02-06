@@ -84,4 +84,5 @@ public class EriSigner {
 
         return Base64.encodeBase64String(signedData.getEncoded());
     }
+
 }
