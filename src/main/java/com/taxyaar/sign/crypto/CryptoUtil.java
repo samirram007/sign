@@ -71,4 +71,26 @@ public class CryptoUtil {
         byte[] keyBytes = Base64.getDecoder().decode(base64Key);
         return new SecretKeySpec(keyBytes, "AES");
     }
+
+    public String getEncryptedPlainText(String plainText, SecretKey key) throws Exception {
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        byte[] plainTextByte = plainText.getBytes();
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        byte[] encryptedByte = cipher.doFinal(plainTextByte);
+        return Base64.getEncoder().encodeToString(encryptedByte);
+    }
+
+    public String encryptForEri(String plainText, String base64Key) throws Exception {
+
+        byte[] keyBytes = Base64.getDecoder().decode(base64Key);
+        SecretKeySpec secretKey = new SecretKeySpec(keyBytes, "AES");
+
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        byte[] encrypted = cipher.doFinal(plainText.getBytes(StandardCharsets.UTF_8));
+
+        return Base64.getEncoder().encodeToString(encrypted);
+    }
 }

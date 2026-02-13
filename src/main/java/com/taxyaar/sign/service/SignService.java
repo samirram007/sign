@@ -1,8 +1,11 @@
 package com.taxyaar.sign.service;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
-import javax.crypto.SecretKey;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,11 +72,13 @@ public class SignService {
 
     public String getEncryptedPlainText(String plainText, String key) throws Exception {
 
-        return cryptoUtil.encrypt(plainText, key);
-        // try {
+
         // return cryptoUtil.encrypt(plainText, key);
-        // } catch (Exception e) {
-        // throw new Exception("Error encrypting plain text: " + e.getMessage(), e);
-        // }
+        try {
+            // return cryptoUtil.encrypt(plainText, key);
+            return cryptoUtil.encryptForEri(plainText, key);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            throw new Exception("Error encrypting plain text: " + e.getMessage(), e);
+        }
     }
 }
