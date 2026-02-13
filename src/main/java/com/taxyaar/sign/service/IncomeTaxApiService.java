@@ -64,6 +64,7 @@ public class IncomeTaxApiService {
         String plainText = "Oracle@123";
         String key = "fkR5WKAStrZ/IXqyPxjaKw==";
         String pass = this.cryptoUtil.encryptForEri(plainText, key);
+        System.out.println("Encrypted Password: " + pass);
         String timeStamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss"));
 
         Map<String, Object> payload = new HashMap<>();
@@ -99,7 +100,9 @@ public class IncomeTaxApiService {
         headers.set("accessMode", "API");
 
         HttpEntity<LoginRequestDto> entity = new HttpEntity<>(requestBody, headers);
-
+        System.Logger logger = System.getLogger(IncomeTaxApiService.class.getName());
+        logger.log(System.Logger.Level.INFO, "Request Body: " + requestBody);
+        logger.log(System.Logger.Level.INFO, "Headers: " + headers);
         ResponseEntity<String> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
