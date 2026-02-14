@@ -17,7 +17,19 @@ public class IncomeTaxApiController {
 
     @PostMapping("/login")
     public String Login() throws Exception {
-
+        // Calling the service method to perform login and get the access token
+        // and returning the result as a String
+        // Assuming the service method login takes the necessary input and returns a
+        // String containing the access token
         return service.login();
+    }
+
+    @PostMapping("prepare-data")
+    public String prepareData() throws Exception {
+        // Calling the service method to prepare the payload for the income tax API
+        // and returning the result as a String
+        // Assuming the service method PreparePayload takes the necessary input and
+        // returns a String containing the prepared payload
+        return service.PreparePayload();
     }
 }

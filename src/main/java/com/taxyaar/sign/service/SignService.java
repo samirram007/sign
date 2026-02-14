@@ -5,7 +5,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,10 +76,25 @@ public class SignService {
     public String getEncryptedPlainText(String plainText, String key) throws Exception {
 
 
-        // return cryptoUtil.encrypt(plainText, key);
+
         try {
-            // return cryptoUtil.encrypt(plainText, key);
-            return cryptoUtil.encryptForEri(plainText, key);
+            byte[] keyBytes = java.util.Base64.getDecoder().decode(key);
+
+            SecretKey secretKey=new SecretKeySpec(keyBytes, "AES");
+            return cryptoUtil.encryptForEri(plainText, secretKey);
+        } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            throw new Exception("Error encrypting plain text: " + e.getMessage(), e);
+        }
+    }
+
+    public String getDecryptedPlainText(String encryptedString, String key) throws
+            Exception {
+
+        try {
+            byte[] keyBytes = java.util.Base64.getDecoder().decode(key);
+
+            SecretKey secretKey=new SecretKeySpec(keyBytes, "AES");
+            return cryptoUtil.decryptForEri(encryptedString, secretKey);
         } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             throw new Exception("Error encrypting plain text: " + e.getMessage(), e);
         }
