@@ -6,6 +6,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+<!--    version fixation applied as told in the replied document-->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -24,15 +25,14 @@
         <commons-codec.version>1.17.1</commons-codec.version>
     </properties>
 
+<!--    fixation about dependencies applied as provided in document-->
     <dependencies>
 
-        <!-- REST API (MVC) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Crypto -->
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
@@ -51,13 +51,11 @@
             <version>1.79</version>
         </dependency>
 
-        <!-- HTTP client -->
         <dependency>
             <groupId>org.apache.httpcomponents.client5</groupId>
             <artifactId>httpclient5</artifactId>
         </dependency>
 
-        <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

@@ -1,6 +1,5 @@
 package com.taxyaar.sign.service;
 
-import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -42,6 +41,10 @@ public class SignService {
         this.cryptoUtil = cryptoUtil;
     }
 
+    public byte[] sign(byte[] rawBytes) throws Exception {
+        return signer.sign(rawBytes);
+    }
+
 //    public SignedDataResponseDto generate(SignedDataRequestDto req) throws Exception {
 //
 //        String rawJson = req.getDataToSign();
@@ -68,6 +71,8 @@ public class SignService {
 //
 //        return res;
 //    }
+
+
 
     public SignedDataResponseDto generate(SignedDataRequestDto req) throws Exception {
 

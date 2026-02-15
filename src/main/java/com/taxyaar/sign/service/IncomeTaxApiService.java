@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.taxyaar.sign.config.TaxConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,14 +30,17 @@ import com.taxyaar.sign.dto.response.SignedDataResponseDto;
 @Service
 public class IncomeTaxApiService {
 
-    private static final System.Logger logger =
-            System.getLogger(IncomeTaxApiService.class.getName());
+    private static final System.Logger logger = System.getLogger(IncomeTaxApiService.class.getName());
 
+
+    UUID uuid = UUID.randomUUID();
     @Autowired
     private RestTemplate restTemplate;
 
     private final SignService signService;
     private final CryptoUtil cryptoUtil;
+    @Autowired
+    private TaxConfig taxConfig;
 
     public IncomeTaxApiService(SignService signService, CryptoUtil cryptoUtil) {
         this.signService = signService;
@@ -44,46 +48,61 @@ public class IncomeTaxApiService {
     }
 
     public String login() throws Exception {
-        try {
 
-            SignedDataRequestDto signedDataReq = new SignedDataRequestDto();
-            signedDataReq.setDataToSign(preparePayload());
-            System.out.println("ERIUSER ID: "+signedDataReq.getEriUserId());
-            signedDataReq.setEriUserId("ERIP014181");
+        // build JSON once
+        String rawJson = preparePayload();
 
-            SignedDataResponseDto signedRes =
-                    signService.generate(signedDataReq);
+        // freeze bytes once
+        byte[] rawBytes = rawJson.getBytes(StandardCharsets.UTF_8);
 
-            LoginRequestDto request = new LoginRequestDto();
-            request.setSign(signedRes.getSign());
-            request.setData(signedRes.getData());
-            System.out.println("ERI USer ID: "+signedRes.getEriUserId());
-            request.setEriUserId(signedRes.getEriUserId());
+        // sign exact bytes
+        byte[] signature = signService.sign(rawBytes);
 
-            logger.log(System.Logger.Level.INFO,
-                    "Sending ERI login request for user: " +
-                            request.getEriUserId());
+        LoginRequestDto request = new LoginRequestDto();
+        request.setData(Base64.getEncoder().encodeToString(rawBytes));
+        request.setSign(Base64.getEncoder().encodeToString(signature));
+        request.setEriUserId(taxConfig.getEriUserId());
 
+        debugLoginRequest(request);
 
-            debugLoginRequest(request);
-
-            return loginApiCall(request);
-
-        } catch (Exception ex) {
-            logger.log(System.Logger.Level.ERROR,
-                    "Login failed", ex);
-            throw new RuntimeException("Login failed", ex);
-        }
+        return loginApiCall(request);
     }
+
+//    public String login() throws Exception {
+//        try {
+//
+//            SignedDataRequestDto signedDataReq = new SignedDataRequestDto();
+//            signedDataReq.setDataToSign(preparePayload());
+//            System.out.println("ERIUSER ID: "+taxConfig.getEriUserId());
+//            signedDataReq.setEriUserId(taxConfig.getEriUserId());
+//
+//            SignedDataResponseDto signedRes =
+//                    signService.generate(signedDataReq);
+//
+//            LoginRequestDto request = new LoginRequestDto();
+//            request.setSign(signedRes.getSign());
+//            request.setData(signedRes.getData());
+//            request.setEriUserId(taxConfig.getEriUserId());
+//
+//            logger.log(System.Logger.Level.INFO,
+//                    "Sending ERI login request for user: " +
+//                            request.getEriUserId());
+//
+//
+//            debugLoginRequest(request);
+//
+//            return loginApiCall(request);
+//
+//        } catch (Exception ex) {
+//            logger.log(System.Logger.Level.ERROR,
+//                    "Login failed", ex);
+//            throw new RuntimeException("Login failed", ex);
+//        }
+//    }
 
     private String preparePayload() throws Exception {
 
-        String serviceName = "EriLoginService";
-        String entity = "ERIP014181";
-        String plainText = "Oracle@123";
-        String key = "fkR5WKAStrZ/IXqyPxjaKw==";
-
-        String pass = cryptoUtil.encryptForEri(plainText, key);
+        String pass = cryptoUtil.encryptForEri(taxConfig.getEriPlainText(), taxConfig.getEriPasswordKey());
         DateTimeFormatter fmt =
                 DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 
@@ -95,8 +114,8 @@ public class IncomeTaxApiService {
 
 
         Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("serviceName", serviceName);
-        payload.put("entity", entity);
+        payload.put("serviceName", taxConfig.getEriServiceName());
+        payload.put("entity", taxConfig.getEriUserId());
         payload.put("pass", pass);
         payload.put("timeStamp", timeStamp);
 
@@ -115,11 +134,27 @@ public class IncomeTaxApiService {
 
         try {
 
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//            headers.set("clientId", taxConfig.getEriClientId());
+//            headers.set("clientSecret", taxConfig.getEriClientSecret());
+//            headers.set("accessMode", taxConfig.getEriAccessMode());
+//            headers.set("User-Agent",taxConfig.getEriUserAgent());
+//            headers.set("X-Request-ID",uuid.toString());
+//            headers.set("Host", "uatocpservices.incometax.gov.in");
+
+
             HttpHeaders headers = new HttpHeaders();
+
             headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.set("clientId", "d679465a50168a9ee14e0035a0199e6f");
-            headers.set("clientSecret", "978cd4c239602bf2e7c0b441b42c503d");
-            headers.set("accessMode", "API");
+            headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+            headers.set("clientId", taxConfig.getEriClientId());
+            headers.set("clientSecret", taxConfig.getEriClientSecret());
+            headers.set("accessMode", taxConfig.getEriAccessMode());
+
+            headers.set("User-Agent", "TaxYaar-ERI-Client/1.0");
+            headers.set("X-Request-ID", UUID.randomUUID().toString());
 
             String decoded = new String(
                     Base64.getDecoder().decode(request.getData()),

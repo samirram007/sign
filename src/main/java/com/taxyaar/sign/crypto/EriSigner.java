@@ -156,6 +156,45 @@ public class EriSigner {
         return signedData.getEncoded();
     }
 
+    public byte[] sign(byte[] payloadBytes) throws Exception {
+
+        LOGGER.info("Entering generateSign");
+
+        PrivateKey privateKey = keyLoader.loadPrivateKey();
+        X509Certificate certificate = keyLoader.loadCertificate();
+
+        ContentSigner contentSigner =
+                new JcaContentSignerBuilder("SHA256withRSA")
+                        .setProvider("BC")
+                        .build(privateKey);
+
+        CMSSignedDataGenerator generator =
+                new CMSSignedDataGenerator();
+
+        generator.addSignerInfoGenerator(
+                new JcaSignerInfoGeneratorBuilder(
+                        new JcaDigestCalculatorProviderBuilder()
+                                .setProvider("BC")
+                                .build()
+                ).build(contentSigner, certificate)
+        );
+
+        // include full chain
+        generator.addCertificates(
+                new JcaCertStore(keyLoader.loadFullChain())
+        );
+
+        CMSTypedData cmsData =
+                new CMSProcessableByteArray(payloadBytes);
+
+        CMSSignedData signedData =
+                generator.generate(cmsData, false); // detached
+
+        LOGGER.info("Exit generateSign");
+
+        return signedData.getEncoded();
+    }
+
 
     public String sign(byte[] data, PrivateKey key, X509Certificate cert)
             throws Exception {
