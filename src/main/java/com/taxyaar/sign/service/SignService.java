@@ -1,5 +1,6 @@
 package com.taxyaar.sign.service;
 
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -41,6 +42,33 @@ public class SignService {
         this.cryptoUtil = cryptoUtil;
     }
 
+//    public SignedDataResponseDto generate(SignedDataRequestDto req) throws Exception {
+//
+//        String rawJson = req.getDataToSign();
+//
+//        System.out.println("===== SIGN INPUT (RAW JSON) =====");
+//        System.out.println(rawJson);
+//        System.out.println("================================");
+//
+//        // ✔ sign RAW JSON bytes
+//        byte[] signedBytes = signer.sign(rawJson);
+//
+//        // ✔ base64 JSON for transport
+//        String base64Data = Base64.encodeBase64String(
+//                rawJson.getBytes(StandardCharsets.UTF_8));
+//
+//        SignedDataResponseDto res = new SignedDataResponseDto();
+//        res.setSign(Base64.encodeBase64String(signedBytes));
+//        res.setData(base64Data);
+//        res.setEriUserId(req.getEriUserId());
+//
+//        System.out.println("===== BASE64 DATA =====");
+//        System.out.println(base64Data);
+//        System.out.println("=======================");
+//
+//        return res;
+//    }
+
     public SignedDataResponseDto generate(SignedDataRequestDto req) throws Exception {
 
         byte[] signedBytes = signer.sign(req.getDataToSign());
@@ -48,6 +76,7 @@ public class SignService {
         SignedDataResponseDto res = new SignedDataResponseDto();
         res.setSign(Base64.encodeBase64String(signedBytes));
         res.setData(Base64.encodeBase64String(req.getDataToSign().getBytes()));
+        System.out.println("Singed User ID: "+req.getEriUserId());
         res.setEriUserId(req.getEriUserId());
 
         return res;
