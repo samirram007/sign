@@ -30,8 +30,7 @@ import java.nio.file.Path;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -54,7 +53,7 @@ public class TestController {
     private final RestTemplate restTemplate =
             new RestTemplate();
 
-    @PostMapping("/login")
+    @PostMapping("/loginnn")
     public String login() throws Exception {
 
         // 1️⃣ Build payload
@@ -168,16 +167,24 @@ public class TestController {
     private String preparePayload() throws Exception {
 
         String pass =
-                cryptoUtil.encryptForEri(
+                cryptoUtil.getEncryptedPlainText(
                         taxConfig.getEriPlainText(),
                         taxConfig.getEriPasswordKey());
+//
+//        DateTimeFormatter fmt =
+//                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+//
+//        String timeStamp =
+//                OffsetDateTime.now(ZoneId.of("Asia/Kolkata"))
+//                        .format(fmt);
 
-        DateTimeFormatter fmt =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                        .withZone(ZoneId.of("Asia/Kolkata"));
 
-        String timeStamp =
-                OffsetDateTime.now(ZoneId.of("Asia/Kolkata"))
-                        .format(fmt);
+        String timeStamp = formatter.format(Instant.now());
+
+        System.out.println("Asia Time: "+timeStamp);
 
         Map<String, Object> payload =
                 new LinkedHashMap<>();

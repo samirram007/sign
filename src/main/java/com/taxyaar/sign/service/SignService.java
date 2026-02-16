@@ -110,7 +110,7 @@ public class SignService {
         // return cryptoUtil.encrypt(plainText, key);
         try {
             // return cryptoUtil.encrypt(plainText, key);
-            return cryptoUtil.encryptForEri(plainText, key);
+            return cryptoUtil.getEncryptedPlainText(plainText, key);
         } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             throw new Exception("Error encrypting plain text: " + e.getMessage(), e);
         }

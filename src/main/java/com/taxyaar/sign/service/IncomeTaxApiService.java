@@ -1,9 +1,7 @@
 package com.taxyaar.sign.service;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -102,12 +100,12 @@ public class IncomeTaxApiService {
 
     private String preparePayload() throws Exception {
 
-        String pass = cryptoUtil.encryptForEri(taxConfig.getEriPlainText(), taxConfig.getEriPasswordKey());
-        DateTimeFormatter fmt =
-                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+        String pass = cryptoUtil.getEncryptedPlainText(taxConfig.getEriPlainText(), taxConfig.getEriPasswordKey());
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+                        .withZone(ZoneId.of("Asia/Kolkata"));
 
-        String timeStamp =
-                OffsetDateTime.now(ZoneId.of("Asia/Kolkata")).format(fmt);
+        String timeStamp = formatter.format(Instant.now());
 
         System.out.println("Encrypted pass length: " + pass.length());
         System.out.println(pass);
@@ -155,6 +153,7 @@ public class IncomeTaxApiService {
 
             headers.set("User-Agent", "TaxYaar-ERI-Client/1.0");
             headers.set("X-Request-ID", UUID.randomUUID().toString());
+            headers.set("Host", "uatocpservices.incometax.gov.in");
 
             String decoded = new String(
                     Base64.getDecoder().decode(request.getData()),

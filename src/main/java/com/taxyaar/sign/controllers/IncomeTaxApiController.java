@@ -15,7 +15,7 @@ public class IncomeTaxApiController {
         this.service = service;
     }
 
-    @PostMapping("/loginnn")
+    @PostMapping("/login")
     public String Login() throws Exception {
 
         return service.login();
