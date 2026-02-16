@@ -11,7 +11,6 @@ public class PfxProperties {
     private String password;
     private String alias;
     private String type;
-    private String userId;
 
     public String getPath() {
         return path;
@@ -44,7 +43,4 @@ public class PfxProperties {
     public void setType(String type) {
         this.type = type;
     }
-
-    public String getUserId(){ return userId;}
-    public void setUserId(){this.userId=userId;}
 }

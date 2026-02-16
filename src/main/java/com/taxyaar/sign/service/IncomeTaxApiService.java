@@ -22,6 +22,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.taxyaar.sign.crypto.CryptoUtil;
 import com.taxyaar.sign.dto.request.LoginRequestDto;
 import com.taxyaar.sign.dto.request.SignedDataRequestDto;
 import com.taxyaar.sign.dto.response.SignedDataResponseDto;
@@ -41,8 +42,9 @@ public class IncomeTaxApiService {
     @Autowired
     private TaxConfig taxConfig;
 
-    public IncomeTaxApiService(SignService signService) {
+    public IncomeTaxApiService(SignService signService, CryptoUtil cryptoUtil) {
         this.signService = signService;
+        this.cryptoUtil = cryptoUtil;
     }
 
     public String login() throws Exception {
