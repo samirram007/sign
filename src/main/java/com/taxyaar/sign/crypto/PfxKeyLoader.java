@@ -7,6 +7,9 @@ import java.security.cert.X509Certificate;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.taxyaar.sign.config.PfxProperties;
 
@@ -46,5 +49,23 @@ public class PfxKeyLoader {
         KeyStore ks = KeyStore.getInstance(props.getType());
         ks.load(resource.getInputStream(), props.getPassword().toCharArray());
         return ks;
+    }
+
+    public List<X509Certificate> loadFullChain() throws Exception {
+
+        KeyStore ks = loadKeyStore();
+
+        Certificate[] chain =
+                ks.getCertificateChain(props.getAlias());
+
+        List<X509Certificate> certs = new ArrayList<>();
+
+        if (chain != null) {
+            for (Certificate cert : chain) {
+                certs.add((X509Certificate) cert);
+            }
+        }
+
+        return certs;
     }
 }
